@@ -577,7 +577,6 @@ See [docs/CHROME_WEB_STORE.md](docs/CHROME_WEB_STORE.md) for listing copy, every
 - Gmail can change private DOM attributes. Selectors are centralized, but Chrome Web Store updates will be needed if Gmail breaks them.
 - The popup shows the latest five server records. It is not a real-time push system; visible Gmail tabs update within roughly one minute.
 - Browser notifications require the declared `notifications` permission and are off by default.
-- Privacy and Terms pages are implementation drafts and are clearly marked for qualified legal review before launch.
 - The repository does not include production secrets, a Supabase project, DNS ownership, or a signed/published Chrome Web Store listing. Those require owner accounts.
 
 ## Manual testing
