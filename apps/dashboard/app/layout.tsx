@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./marketing.css";
 
@@ -8,22 +9,37 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://opentrackmail.com"),
-  title: { default: "OpenTrackMail | Open-source email tracking", template: "%s | OpenTrackMail" },
-  description: "Simple, privacy-conscious email open tracking for the inboxes you already use.",
+  metadataBase: new URL(SITE_URL),
+  applicationName: "OpenTrackMail",
+  title: { default: "OpenTrackMail – Open-Source Email Tracking", template: "%s | OpenTrackMail" },
+  description: "Free, open-source email tracking for Gmail and modern inboxes. Get private open notifications without adding a CRM to your workflow.",
+  keywords: ["email tracking", "open source email tracker", "Gmail email tracker", "email open tracking", "Chrome extension"],
+  authors: [{ name: "OpenTrackMail", url: SITE_URL }],
+  creator: "OpenTrackMail",
+  publisher: "OpenTrackMail",
+  category: "technology",
+  referrer: "origin-when-cross-origin",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
   openGraph: {
     type: "website",
     url: "/",
     siteName: "OpenTrackMail",
-    title: "OpenTrackMail | Open-source email tracking",
-    description: "Simple, privacy-conscious email open tracking for the inboxes you already use.",
-    images: [{ url: "/opentrackmail-logo.png", width: 512, height: 512, alt: "OpenTrackMail" }],
+    title: "OpenTrackMail – Open-Source Email Tracking",
+    description: "Know when emails are opened with a focused, privacy-conscious Chrome extension—no CRM required.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "OpenTrackMail open-source email tracking" }],
   },
   twitter: {
-    card: "summary",
-    title: "OpenTrackMail | Open-source email tracking",
-    description: "Simple, privacy-conscious email open tracking for the inboxes you already use.",
-    images: [{ url: "/opentrackmail-logo.png", alt: "OpenTrackMail" }],
+    card: "summary_large_image",
+    title: "OpenTrackMail – Open-Source Email Tracking",
+    description: "Know when emails are opened—without turning your inbox into a CRM.",
+    images: ["/opengraph-image"],
   },
 };
 

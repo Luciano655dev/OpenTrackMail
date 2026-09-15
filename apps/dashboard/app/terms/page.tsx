@@ -1,6 +1,6 @@
 import { Footer, Header } from "@/components/site-chrome";
 
-export const metadata = { title: "Terms of Service" };
+export const metadata = { title: "Terms of Service", description: "Terms governing lawful and responsible use of OpenTrackMail email tracking.", alternates: { canonical: "/terms" } };
 
 export default function TermsPage() {
   return <><Header /><main className="legal container"><p className="eyebrow">Last updated September 14, 2026</p><h1>Terms of Service</h1><p className="legal-notice"><strong>Legal review required before public launch.</strong> These draft terms describe the intended MVP and are not legal advice.</p>

@@ -1,0 +1,19 @@
+# OpenTrackMail
+
+> OpenTrackMail is a free, MIT-licensed email-open tracking tool for Gmail and modern inboxes. It provides inbox status indicators and a private history dashboard without acting as a CRM.
+
+## Primary pages
+
+- [Home](https://opentrackmail.com/): Product overview, features, limitations, installation, and self-hosting.
+- [Status](https://opentrackmail.com/status): Aggregate community usage metrics.
+- [Privacy](https://opentrackmail.com/privacy): Data handling and privacy policy.
+- [Terms](https://opentrackmail.com/terms): Responsible-use terms and tracking limitations.
+- [Source code](https://github.com/Luciano655dev/OpenTrackMail): MIT-licensed Next.js, Supabase, and Chrome extension source.
+- [API documentation](https://github.com/Luciano655dev/OpenTrackMail/blob/main/docs/API.md): Authenticated extension API reference.
+
+## Important facts
+
+- An “open” means the tracking image was requested; it does not prove a human read the email.
+- OpenTrackMail stores message metadata, not email bodies.
+- Results can be affected by image proxies, privacy tools, caching, scanners, and image blocking.
+- The project can be self-hosted with a separate Supabase project and Vercel deployment.

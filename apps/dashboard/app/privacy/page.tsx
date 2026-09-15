@@ -1,6 +1,6 @@
 import { Footer, Header } from "@/components/site-chrome";
 
-export const metadata = { title: "Privacy Policy" };
+export const metadata = { title: "Privacy Policy", description: "How OpenTrackMail handles account, message metadata, and email-open events.", alternates: { canonical: "/privacy" } };
 
 export default function PrivacyPage() {
   return <><Header /><main className="legal container"><p className="eyebrow">Last updated September 14, 2026</p><h1>Privacy Policy</h1><p className="legal-notice"><strong>Legal review required before public launch.</strong> This policy describes the intended MVP behavior and is not legal advice.</p>

@@ -16,6 +16,7 @@ const csp = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   transpilePackages: ["@opentrackmail/shared"],
   async redirects() {
     return [

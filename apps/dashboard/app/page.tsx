@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import Script from "next/script";
 import {
   ArrowRight,
   BadgeCheck,
@@ -15,14 +17,60 @@ import {
 import { DashboardMockup, GmailMockup } from "@/components/product-mockups";
 import { Footer, Header } from "@/components/site-chrome";
 import { formatStat, getPublicStats, shouldShowSocialProof } from "@/lib/public-stats";
+import { GITHUB_URL, SITE_URL } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "OpenTrackMail",
+      url: SITE_URL,
+      logo: `${SITE_URL}/opentrackmail-logo.png`,
+      sameAs: [GITHUB_URL],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "OpenTrackMail",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#software`,
+      name: "OpenTrackMail",
+      url: SITE_URL,
+      description: "Free, open-source email tracking for Gmail and modern inboxes.",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Google Chrome, Chromium",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      license: "https://opensource.org/license/mit",
+      codeRepository: GITHUB_URL,
+      featureList: ["Email open tracking", "Inbox status indicators", "Open history", "Private dashboard", "Self-hosting"],
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
 
 export default async function Home() {
   const stats = await getPublicStats();
 
   return (
     <>
+      <Script
+        id="opentrackmail-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       <Header />
       <main>
         <section className="hero container">

@@ -13,11 +13,20 @@
 </p>
 
 <p align="center">
+  <a href="https://opentrackmail.com"><strong>Website</strong></a> ·
+  <a href="docs/API.md">API docs</a> ·
+  <a href="#private-self-hosting-guide">Self-hosting guide</a> ·
+  <a href="docs/SEO_LAUNCH.md">SEO & launch</a>
+</p>
+
+<p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-5f83c5.svg" /></a>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-171717.svg" />
   <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Postgres-3ecf8e.svg" />
   <img alt="Chrome MV3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-4285f4.svg" />
 </p>
+
+![OpenTrackMail email tracking dashboard and inbox integration](public/preview-image.png)
 
 OpenTrackMail puts lightweight tracking signals where you already work. Write and send from your inbox as usual, see status beside sent messages, and use the private dashboard when you need the full timeline. It stores message metadata—not message bodies—and its complete tracking path is available for inspection.
 
@@ -433,6 +442,7 @@ Copy `.env.example` to `apps/dashboard/.env.local`. Copy the `VITE_*` variables 
 | `TRACKING_PIXEL_ORIGIN` | dashboard server | Public HTTPS origin embedded in messages. Use a tunnel locally and `https://opentrackmail.com` in production. |
 | `ALLOWED_EXTENSION_ORIGINS` | dashboard server | Comma-separated exact `chrome-extension://…` origins. Empty permits extension origins in local development only. |
 | `NEXT_PUBLIC_SITE_URL` | unified web app | Canonical public origin used for metadata. |
+| `GOOGLE_SITE_VERIFICATION` | dashboard server | Optional Google Search Console HTML-tag verification token. |
 | `VITE_API_URL` | extension build | API origin. |
 | `VITE_APP_URL` | extension build | Product base URL opened from the popup, including `/app`. |
 | `VITE_SUPABASE_URL` | extension build | Supabase project URL used to begin Google OAuth. |

@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Activity, ArrowRight, Github, MailPlus, Radio, ShieldCheck, Users } from "lucide-react";
 import { Footer, Header } from "@/components/site-chrome";
+import { DailyMetricChart } from "@/components/daily-metric-chart";
 import { formatStat, getPublicStats } from "@/lib/public-stats";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Status",
   description: "Live OpenTrackMail community usage: accounts created and emails tracked.",
+  alternates: { canonical: "/status" },
 };
 
 export default async function StatusPage() {
@@ -49,13 +51,18 @@ export default async function StatusPage() {
           </article>
         </section>
 
+        {stats?.history.length ? <section className="container status-charts" aria-label="Daily activity over the last 30 days">
+          <DailyMetricChart title="Account growth" description="New accounts created each day, last 30 days" points={stats.history.map((day) => ({ date: day.date, value: day.accounts }))} singular="account" plural="accounts" />
+          <DailyMetricChart title="Email activity" description="Emails registered for tracking each day, last 30 days" points={stats.history.map((day) => ({ date: day.date, value: day.trackedEmails }))} singular="email" plural="emails" />
+        </section> : null}
+
         <section className="container status-details">
           <div>
             <p className="section-kicker">What these numbers mean</p>
             <h2>Useful totals, with privacy intact.</h2>
           </div>
           <div className="status-notes">
-            <article><Activity aria-hidden="true" /><div><h3>Fresh on every visit</h3><p>The totals are read from the live database when this page loads. Last checked {updatedAt} UTC.</p></div></article>
+            <article><Activity aria-hidden="true" /><div><h3>Updated regularly</h3><p>The totals refresh from the live database at least every five minutes. Last checked {updatedAt} UTC.</p></div></article>
             <article><ShieldCheck aria-hidden="true" /><div><h3>Aggregate only</h3><p>This page counts accounts and tracked messages. It never returns identities or the metadata belonging to any individual message.</p></div></article>
             <article><Github aria-hidden="true" /><div><h3>Verifiable and open source</h3><p>The implementation is public, from the database schema to the code that renders these counters.</p><a href="https://github.com/luciano655dev/OpenTrackMail" target="_blank" rel="noreferrer">Inspect the repository <ArrowRight size={15} /></a></div></article>
           </div>
