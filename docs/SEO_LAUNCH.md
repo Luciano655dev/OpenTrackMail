@@ -13,7 +13,7 @@ The application already serves canonical metadata, Schema.org JSON-LD, `sitemap.
 
 ## GitHub discovery
 
-Set the repository website to `https://opentrackmail.com`, upload `public/preview-image.png` as the social preview, and use these topics:
+Set the repository website to `https://opentrackmail.com`, upload `apps/dashboard/public/preview-image.png` as the social preview, and use these topics:
 
 `email-tracking`, `gmail`, `chrome-extension`, `open-source`, `nextjs`, `supabase`, `typescript`, `manifest-v3`, `self-hosted`, `privacy`
 

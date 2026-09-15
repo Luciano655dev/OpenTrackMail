@@ -21,12 +21,13 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-5f83c5.svg" /></a>
+  <a href="https://github.com/Luciano655dev/OpenTrackMail/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/Luciano655dev/OpenTrackMail/actions/workflows/ci.yml/badge.svg" /></a>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-171717.svg" />
   <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Postgres-3ecf8e.svg" />
   <img alt="Chrome MV3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-4285f4.svg" />
 </p>
 
-![OpenTrackMail email tracking dashboard and inbox integration](public/preview-image.png)
+![OpenTrackMail email tracking dashboard and inbox integration](apps/dashboard/public/preview-image.png)
 
 OpenTrackMail puts lightweight tracking signals where you already work. Write and send from your inbox as usual, see status beside sent messages, and use the private dashboard when you need the full timeline. It stores message metadata—not message bodies—and its complete tracking path is available for inspection.
 
@@ -84,7 +85,9 @@ Dashboard server components
 opentrackmail/
 ├── apps/
 │   ├── dashboard/              # unified site + /app + API + pixel endpoint, Next.js
+│   │   └── .env.example        # dashboard/server configuration template
 │   └── extension/              # Chrome MV3, CRXJS/Vite, Gmail provider
+│       └── .env.example        # public extension build configuration
 ├── packages/shared/            # API schemas and shared TypeScript types
 ├── supabase/
 │   ├── migrations/             # PostgreSQL schema, RLS, RPC
@@ -93,8 +96,8 @@ opentrackmail/
 ├── docs/
 │   ├── API.md
 │   ├── CHROME_WEB_STORE.md
-│   └── MANUAL_TESTING.md
-├── .env.example
+│   ├── MANUAL_TESTING.md
+│   └── SEO_LAUNCH.md
 └── package.json                # npm workspaces
 ```
 
@@ -148,8 +151,8 @@ The repository uses npm workspaces. Run `npm install` only at the repository roo
 Create local environment files from the safe template:
 
 ```bash
-cp .env.example apps/dashboard/.env.local
-cp .env.example apps/extension/.env.local
+cp apps/dashboard/.env.example apps/dashboard/.env.local
+cp apps/extension/.env.example apps/extension/.env.local
 ```
 
 These files are ignored by Git. Never commit a real service-role key, Google client secret, or hashing secret.
@@ -431,7 +434,7 @@ If setup still fails, run the quality commands below and work through [docs/MANU
 
 ## Environment variables
 
-Copy `.env.example` to `apps/dashboard/.env.local`. Copy the `VITE_*` variables to `apps/extension/.env.local`.
+Each workspace owns its configuration template. Copy `apps/dashboard/.env.example` and `apps/extension/.env.example` to `.env.local` in the same directory.
 
 | Variable | Used by | Purpose |
 | --- | --- | --- |
@@ -470,8 +473,8 @@ The new-user trigger creates `profiles` and `settings`. RLS prevents authenticat
 Prerequisites: Node.js 20.19+, npm 10+, Docker Desktop for local Supabase, and Chrome.
 
 ```bash
-cp .env.example apps/dashboard/.env.local
-cp .env.example apps/extension/.env.local
+cp apps/dashboard/.env.example apps/dashboard/.env.local
+cp apps/extension/.env.example apps/extension/.env.local
 npm install
 supabase start
 supabase db reset
@@ -568,7 +571,7 @@ See [docs/CHROME_WEB_STORE.md](docs/CHROME_WEB_STORE.md) for listing copy, every
 - Recipient testing requires a publicly reachable HTTPS pixel origin. Use the documented Cloudflare tunnel locally or the production site origin after deployment.
 - The first pixel request is always ignored to prevent Gmail's send-time proxy request from appearing as an open. If a provider performs no automatic request, the first genuine recipient open will also be ignored.
 - The sender-tab protection covers the send-time load and immediate Gmail rerenders. Opening the sender's own Sent copy after the one-minute protection expires is indistinguishable from another image load.
-- Gmail is the only supported provider in v1. Outlook and generic provider boundaries exist but are explicitly unsupported.
+- Gmail is the only supported provider in v1.
 - Sent-row association is best when Gmail exposes a thread ID. Before that metadata is discoverable, exact subject matching is used and can be ambiguous when identical subjects are sent close together.
 - Replies, forwards, scheduled send, offline send, keyboard shortcuts, and Gmail experiments can change compose behavior. Basic replies/forwards should work, but scheduled/offline send is not guaranteed.
 - Gmail can change private DOM attributes. Selectors are centralized, but Chrome Web Store updates will be needed if Gmail breaks them.

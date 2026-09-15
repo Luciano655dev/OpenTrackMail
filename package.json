@@ -13,7 +13,7 @@
     "test": "npm run test -w @opentrackmail/dashboard && npm run test -w @opentrackmail/extension",
     "typecheck": "npm run typecheck -w @opentrackmail/shared && npm run typecheck -w @opentrackmail/dashboard && npm run typecheck -w @opentrackmail/extension",
     "lint": "npm run lint -w @opentrackmail/dashboard && npm run lint -w @opentrackmail/extension",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
