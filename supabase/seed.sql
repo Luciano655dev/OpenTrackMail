@@ -1,0 +1,3 @@
+-- Seed data is intentionally opt-in. Replace the UUID with a real local auth.users ID.
+-- insert into public.tracked_emails (user_id, tracking_id, subject, recipients, recipients_text, sent_at)
+-- values ('00000000-0000-0000-0000-000000000000', '0123456789abcdefghijklmnopqrstuv', 'Partnership opportunity', array['scott@example.com'], 'scott@example.com', now());
