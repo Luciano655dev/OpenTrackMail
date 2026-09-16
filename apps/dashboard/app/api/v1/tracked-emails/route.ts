@@ -19,6 +19,14 @@ export async function POST(request: NextRequest) {
     const { data: existing } = await admin.from("tracked_emails").select("*").eq("user_id", auth.user.id).eq("client_message_id", payload.clientMessageId).maybeSingle();
     if (existing) return json({ email: summarizeEmail(existing), pixelUrl: `${serverEnv().TRACKING_PIXEL_ORIGIN}/t/${existing.tracking_id}.gif` }, { headers: corsHeaders(request) });
   }
+  const pixelOrigin = serverEnv().TRACKING_PIXEL_ORIGIN;
+  try {
+    const health = await fetch(`${pixelOrigin}/api/health`, { cache: "no-store", signal: AbortSignal.timeout(4000) });
+    if (!health.ok || !(await health.json()).ok) throw new Error(`Pixel origin health check returned ${health.status}`);
+  } catch (error) {
+    console.error("OpenTrackMail pixel origin unavailable", { origin: pixelOrigin, error: String(error) });
+    return json({ error: { code: "pixel_unavailable", message: "Tracking is unavailable right now. Your email was not sent; try again shortly." } }, { status: 503, headers: corsHeaders(request) });
+  }
   const trackingId = createTrackingId();
   const { data, error } = await admin.from("tracked_emails").insert({
     user_id: auth.user.id,
@@ -33,7 +41,7 @@ export async function POST(request: NextRequest) {
     sent_at: payload.sentAt || new Date().toISOString(),
   }).select("*").single();
   if (error) return json({ error: { code: "internal_error", message: "Could not create tracking record" } }, { status: 500, headers: corsHeaders(request) });
-  return json({ email: summarizeEmail(data), pixelUrl: `${serverEnv().TRACKING_PIXEL_ORIGIN}/t/${trackingId}.gif` }, { status: 201, headers: corsHeaders(request) });
+  return json({ email: summarizeEmail(data), pixelUrl: `${pixelOrigin}/t/${trackingId}.gif` }, { status: 201, headers: corsHeaders(request) });
 }
 
 export async function GET(request: NextRequest) {

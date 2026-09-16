@@ -559,7 +559,7 @@ Gmail is a dynamic SPA. `providers/gmail/selectors.ts` is the repair boundary fo
 
 Sent-row matching prefers Gmail thread IDs when available and falls back to recent exact subject matching. The extension syncs at most every 45 seconds, runs a 60-second visible-tab interval, and refreshes on visibility or Gmail hash navigation. It does not continuously poll in background tabs.
 
-Before Gmail Send resumes, the extension installs a temporary Manifest V3 session rule that blocks only the exact pixel URL in the initiating Gmail tab. The rule expires after 60 seconds and does not affect recipient devices. Because Gmail can also fetch the image from its servers, the backend retains but ignores the first pixel request for every tracked email. The next distinct request becomes the first displayed open. Requests with the same privacy-preserving source signature inside 10 seconds are stored as `rapid_duplicate` but do not inflate the displayed count.
+Before Gmail Send resumes, the extension installs a temporary Manifest V3 session rule that blocks only the exact pixel URL in the initiating Gmail tab. The rule expires after 60 seconds and does not affect recipient devices. The API checks that the pixel origin is reachable before creating a tracking record. Because Gmail can also fetch the image from its servers while sending, the backend ignores a first request within 60 seconds of send. A first request after that window counts as an open. Requests with the same privacy-preserving source signature inside 10 seconds are stored as `rapid_duplicate` but do not inflate the displayed count.
 
 ## Chrome Web Store
 
@@ -569,7 +569,7 @@ See [docs/CHROME_WEB_STORE.md](docs/CHROME_WEB_STORE.md) for listing copy, every
 
 - Open tracking only shows that the tracking image was requested. Proxying, preloading, caching, image blocking, security scanners, and privacy protections can produce false positives or missed opens.
 - Recipient testing requires a publicly reachable HTTPS pixel origin. Use the documented Cloudflare tunnel locally or the production site origin after deployment.
-- The first pixel request is always ignored to prevent Gmail's send-time proxy request from appearing as an open. If a provider performs no automatic request, the first genuine recipient open will also be ignored.
+- A recipient opening within 60 seconds of send can be missed if that load is the first pixel request. A later first load counts.
 - The sender-tab protection covers the send-time load and immediate Gmail rerenders. Opening the sender's own Sent copy after the one-minute protection expires is indistinguishable from another image load.
 - Gmail is the only supported provider in v1.
 - Sent-row association is best when Gmail exposes a thread ID. Before that metadata is discoverable, exact subject matching is used and can be ambiguous when identical subjects are sent close together.

@@ -12,8 +12,9 @@
 - [ ] Add recipient, subject, and body, then send the tracked message.
 - [ ] Confirm the dashboard is local while `TRACKING_PIXEL_ORIGIN` and extension `VITE_API_URL` use the active Cloudflare HTTPS tunnel.
 - [ ] Send a tracked message and confirm the temporary session rule prevents the sender Gmail tab from creating an open event.
-- [ ] Confirm the first pixel request is stored as `early_automatic` and the message remains at one check.
-- [ ] Open the message from the recipient and confirm the next distinct request becomes the first displayed open.
+- [ ] Confirm a first pixel request within 60 seconds of send is stored as `early_automatic` and the message remains at one check.
+- [ ] Confirm a first pixel request after 60 seconds counts as an open, even if no earlier request was received.
+- [ ] Confirm a distinct recipient request after an `early_automatic` event becomes the first displayed open.
 - [ ] Confirm same-source requests within 10 seconds are stored as `rapid_duplicate` without increasing the displayed count.
 - [ ] Inspect the received HTML and confirm exactly one invisible `data-opentrackmail-pixel` image exists.
 - [ ] Open Gmail Sent. Confirm one gray check appears for the tracked message and no icon appears for the untracked message.
