@@ -1,6 +1,6 @@
 # OpenTrackMail API
 
-Base URL in production: `https://opentrackmail.com`
+Base URL in production: `https://opentrackmail.vercel.app`
 
 Authenticated routes require `Authorization: Bearer <supabase-access-token>`. JSON errors use `{ "error": { "code": string, "message": string } }`. Extension CORS is restricted with `ALLOWED_EXTENSION_ORIGINS`. Authenticated APIs allow 300 requests per user per minute; the token exchange allows 30 requests per keyed source per minute.
 

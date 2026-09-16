@@ -48,6 +48,8 @@ export async function handleMessage(message: BackgroundMessage, sender: chrome.r
     if (tabId === undefined) throw new Error("The Gmail tab could not be identified");
     const result = await createTrackedEmail(message.payload);
     try {
+      const expectedPixelOrigin = new URL(import.meta.env.VITE_PIXEL_ORIGIN).origin;
+      if (new URL(result.pixelUrl).origin !== expectedPixelOrigin) throw new Error("The tracking pixel points to the wrong server. Reload the extension and try again.");
       await protectPixelRequest(result.pixelUrl, tabId);
     } catch (error) {
       await deleteTrackedEmail(result.email.id).catch(() => undefined);

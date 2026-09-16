@@ -7,7 +7,10 @@ export default defineManifest(({ mode }) => ({
   description: "Simple, open-source email tracking for the inboxes you already use.",
   minimum_chrome_version: "116",
   permissions: ["identity", "storage", "notifications", "alarms", "declarativeNetRequestWithHostAccess"],
-  host_permissions: [`${new URL(process.env.OTM_API_URL_FOR_MANIFEST || "http://localhost:3001").origin}/*`],
+  host_permissions: [...new Set([
+    `${new URL(process.env.OTM_API_URL_FOR_MANIFEST!).origin}/*`,
+    `${new URL(process.env.OTM_PIXEL_ORIGIN_FOR_MANIFEST!).origin}/*`,
+  ])],
   background: { service_worker: "src/background.ts", type: "module" },
   action: { default_popup: "src/popup/index.html", default_title: "OpenTrackMail", default_icon: { "16": "icons/icon-16.png", "32": "icons/icon-32.png" } },
   icons: { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },

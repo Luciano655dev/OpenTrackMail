@@ -10,7 +10,7 @@
 - [ ] Open Gmail and create two compose windows. Confirm each has its own Track email toggle.
 - [ ] Turn tracking off in one compose. Confirm the other remains on.
 - [ ] Add recipient, subject, and body, then send the tracked message.
-- [ ] Confirm the dashboard is local while `TRACKING_PIXEL_ORIGIN` and extension `VITE_API_URL` use the active Cloudflare HTTPS tunnel.
+- [ ] In developer mode, confirm the extension API uses `http://localhost:3001`, the pixel uses the public HTTPS deployment, and both use the same Supabase project.
 - [ ] Send a tracked message and confirm the temporary session rule prevents the sender Gmail tab from creating an open event.
 - [ ] Confirm a first pixel request within 60 seconds of send is stored as `early_automatic` and the message remains at one check.
 - [ ] Confirm a first pixel request after 60 seconds counts as an open, even if no earlier request was received.

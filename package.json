@@ -8,7 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n web,extension -c green,magenta \"npm run dev -w @opentrackmail/dashboard\" \"npm run dev -w @opentrackmail/extension\"",
+    "dev": "node scripts/dev-tracking.mjs",
+    "dev:tracking": "node scripts/dev-tracking.mjs",
     "build": "npm run build -w @opentrackmail/shared && npm run build -w @opentrackmail/dashboard && npm run build -w @opentrackmail/extension",
     "test": "npm run test -w @opentrackmail/dashboard && npm run test -w @opentrackmail/extension",
     "typecheck": "npm run typecheck -w @opentrackmail/shared && npm run typecheck -w @opentrackmail/dashboard && npm run typecheck -w @opentrackmail/extension",

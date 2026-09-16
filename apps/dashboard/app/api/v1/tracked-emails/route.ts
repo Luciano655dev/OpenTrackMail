@@ -15,10 +15,6 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return json({ error: { code: "invalid_input", message: "Invalid tracked email", details: parsed.error.flatten() } }, { status: 400, headers: corsHeaders(request) });
   const admin = createAdminClient();
   const payload = parsed.data;
-  if (payload.clientMessageId) {
-    const { data: existing } = await admin.from("tracked_emails").select("*").eq("user_id", auth.user.id).eq("client_message_id", payload.clientMessageId).maybeSingle();
-    if (existing) return json({ email: summarizeEmail(existing), pixelUrl: `${serverEnv().TRACKING_PIXEL_ORIGIN}/t/${existing.tracking_id}.gif` }, { headers: corsHeaders(request) });
-  }
   const pixelOrigin = serverEnv().TRACKING_PIXEL_ORIGIN;
   try {
     const health = await fetch(`${pixelOrigin}/api/health`, { cache: "no-store", signal: AbortSignal.timeout(4000) });
@@ -26,6 +22,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("OpenTrackMail pixel origin unavailable", { origin: pixelOrigin, error: String(error) });
     return json({ error: { code: "pixel_unavailable", message: "Tracking is unavailable right now. Your email was not sent; try again shortly." } }, { status: 503, headers: corsHeaders(request) });
+  }
+  if (payload.clientMessageId) {
+    const { data: existing } = await admin.from("tracked_emails").select("*").eq("user_id", auth.user.id).eq("client_message_id", payload.clientMessageId).maybeSingle();
+    if (existing) return json({ email: summarizeEmail(existing), pixelUrl: `${pixelOrigin}/t/${existing.tracking_id}.gif` }, { headers: corsHeaders(request) });
   }
   const trackingId = createTrackingId();
   const { data, error } = await admin.from("tracked_emails").insert({

@@ -18,9 +18,8 @@ export function serverEnv() {
     EVENT_HASH_SECRET: z.string().min(32),
     TRACKING_PIXEL_ORIGIN: z.url().refine((value) => {
       const url = new URL(value);
-      const localHost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
-      return url.protocol === "https:" || (url.protocol === "http:" && localHost);
-    }, "Tracking pixel origin must use HTTPS unless it is local"),
+      return url.protocol === "https:" && !["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+    }, "Tracking pixel origin must be public HTTPS"),
   }).safeParse(process.env);
   if (!parsed.success) throw new Error("Missing or invalid OpenTrackMail server environment variables");
   return parsed.data;

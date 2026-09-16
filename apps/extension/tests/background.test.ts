@@ -49,6 +49,7 @@ const message = { type: "CREATE_TRACKED_EMAIL" as const, payload: { subject: "He
 describe("tracked send coordination", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("VITE_PIXEL_ORIGIN", "https://api.example");
     mocks.createTrackedEmail.mockResolvedValue({ email, pixelUrl: "https://api.example/t/abc.gif" });
     mocks.protectPixelRequest.mockResolvedValue(123);
     mocks.deleteTrackedEmail.mockResolvedValue(undefined);

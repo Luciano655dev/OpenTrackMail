@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://opentrackmail.com"><strong>Website</strong></a> ·
+  <a href="https://opentrackmail.vercel.app"><strong>Website</strong></a> ·
   <a href="docs/API.md">API docs</a> ·
   <a href="#private-self-hosting-guide">Self-hosting guide</a> ·
   <a href="docs/SEO_LAUNCH.md">SEO & launch</a>
@@ -66,7 +66,7 @@ OpenTrackMail puts lightweight tracking signals where you already work. Write an
 Gmail content script
   ├─ registers a tracked email → app/API (Supabase user JWT)
   ├─ temporarily blocks that pixel only in the sender's Gmail tab
-  ├─ inserts https://opentrackmail.com/t/<opaque-id>.gif
+  ├─ inserts https://opentrackmail.vercel.app/t/<opaque-id>.gif
   └─ syncs recent summaries → Gmail checks + extension popup
 
 Recipient email client
@@ -124,7 +124,7 @@ Install or create the following before you begin:
 - A free [Supabase](https://supabase.com/) account.
 - A [Google Cloud](https://console.cloud.google.com/) project for OAuth.
 - A [Vercel](https://vercel.com/) account if you want a permanent public deployment.
-- Optional: [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) for testing real email opens while the web app runs locally.
+- Optional: [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) when testing with a fully local Supabase project.
 - Optional: Docker Desktop if you want the fully local Supabase stack.
 
 Check the local tools:
@@ -254,7 +254,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_OR_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 
 NEXT_PUBLIC_SITE_URL=http://localhost:3001
-TRACKING_PIXEL_ORIGIN=https://YOUR_TEMPORARY_PUBLIC_HTTPS_ORIGIN
+TRACKING_PIXEL_ORIGIN=https://YOUR_DEPLOYED_PUBLIC_HTTPS_ORIGIN
 ALLOWED_EXTENSION_ORIGINS=
 EVENT_HASH_SECRET=YOUR_RANDOM_SECRET
 ```
@@ -267,21 +267,22 @@ openssl rand -base64 48
 
 Copy the command output into `EVENT_HASH_SECRET`. This secret creates privacy-preserving request signatures used for short-window duplicate detection. Do not reuse your database password or service-role key.
 
-For initial UI work, `TRACKING_PIXEL_ORIGIN` may temporarily be `http://localhost:3001`. Before sending a real test email, replace it with an HTTPS tunnel or deployed origin; recipients cannot load your computer’s localhost.
+`TRACKING_PIXEL_ORIGIN` must be a working public HTTPS deployment connected to the same Supabase project. Recipients cannot load your computer’s localhost.
 
 ### 8. Configure and build the Chrome extension
 
-Edit `apps/extension/.env.local`:
+Edit `apps/extension/.env.local` with the Supabase project URL. For a production build, edit the public settings in `apps/extension/.env.production` for your deployment:
 
 ```dotenv
-VITE_API_URL=http://localhost:3001
-VITE_APP_URL=http://localhost:3001/app
+VITE_API_URL=https://YOUR_DEPLOYED_PUBLIC_HTTPS_ORIGIN
+VITE_PIXEL_ORIGIN=https://YOUR_DEPLOYED_PUBLIC_HTTPS_ORIGIN
+VITE_APP_URL=https://YOUR_DEPLOYED_PUBLIC_HTTPS_ORIGIN/app
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 ```
 
 Only `VITE_*` values are compiled into the extension. They are public by design. Do not add `SUPABASE_SERVICE_ROLE_KEY`, `EVENT_HASH_SECRET`, or a Google client secret to this file.
 
-Build the extension:
+Build the production extension after the public deployment is ready:
 
 ```bash
 npm run build -w @opentrackmail/extension
@@ -329,9 +330,9 @@ Open `http://localhost:3001`, choose **Sign in**, and complete Google authentica
 
 If Google returns `redirect_uri_mismatch`, compare the Google redirect URI character-for-character with the Supabase callback URL—not the application callback URL. If Supabase rejects the extension callback, confirm the `.chromiumapp.org/supabase-auth` URL is in the Supabase redirect allowlist.
 
-### 10. Test a real open with an HTTPS tunnel
+### 10. Test a real open with a public pixel endpoint
 
-A tracking image in somebody else’s inbox cannot reach `localhost`. For a temporary end-to-end test, keep the app local but give port 3001 a public HTTPS address:
+A tracking image in somebody else’s inbox cannot reach `localhost`. The recommended setup is a stable HTTPS deployment connected to the same Supabase project as the local dashboard. The local development command uses that deployment for pixels. If you are using a fully local database, expose the local dashboard with an HTTPS tunnel:
 
 ```bash
 cloudflared --config /dev/null tunnel --url http://localhost:3001
@@ -442,7 +443,7 @@ Each workspace owns its configuration template. Copy `apps/dashboard/.env.exampl
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | dashboard | Supabase publishable/anon key. Public; RLS protects records. |
 | `SUPABASE_SERVICE_ROLE_KEY` | dashboard server only | Pixel RPC and account deletion. Never expose or prefix with `NEXT_PUBLIC_`/`VITE_`. |
 | `EVENT_HASH_SECRET` | dashboard server only | At least 32 random bytes for HMAC request signatures. Generate with `openssl rand -base64 48`. |
-| `TRACKING_PIXEL_ORIGIN` | dashboard server | Public HTTPS origin embedded in messages. Use a tunnel locally and `https://opentrackmail.com` in production. |
+| `TRACKING_PIXEL_ORIGIN` | dashboard server | Public HTTPS origin embedded in messages. Local development uses the production pixel deployment when both apps share Supabase. |
 | `ALLOWED_EXTENSION_ORIGINS` | dashboard server | Comma-separated exact `chrome-extension://…` origins. Empty permits extension origins in local development only. |
 | `NEXT_PUBLIC_SITE_URL` | unified web app | Canonical public origin used for metadata. |
 | `GOOGLE_SITE_VERIFICATION` | dashboard server | Optional Google Search Console HTML-tag verification token. |
@@ -470,32 +471,18 @@ The new-user trigger creates `profiles` and `settings`. RLS prevents authenticat
 
 ## Local development
 
-Prerequisites: Node.js 20.19+, npm 10+, Docker Desktop for local Supabase, and Chrome.
+Prerequisites: Node.js 22+, npm 10+, Chrome, and a working public HTTPS pixel deployment. Fill `apps/dashboard/.env.local` and `apps/extension/.env.local` from their examples with credentials for the same Supabase project. Set `VITE_SUPABASE_URL` and `VITE_PIXEL_ORIGIN` in `apps/extension/.env.production` to that project and its public deployment.
 
 ```bash
-cp apps/dashboard/.env.example apps/dashboard/.env.local
-cp apps/extension/.env.example apps/extension/.env.local
 npm install
-supabase start
-supabase db reset
-npm run dev
+npm run dev:tracking
 ```
 
-Replace the placeholder Supabase values in both `.env.local` files with values printed by `supabase status`. The unified site runs at `http://localhost:3001` with the product under `/app`, and the extension rebuilds into `apps/extension/dist`.
+The command checks both servers, then runs the dashboard/API at `http://localhost:3001` and rebuilds the developer extension into `apps/extension/dist`. The recipient image uses the public HTTPS endpoint and the same database. Load `dist` as an unpacked extension at `chrome://extensions`, then reload the extension and refresh Gmail after each rebuild. Keep the command running while sending. The command fails if the local and production Supabase project URLs differ or if the public pixel endpoint is down.
 
-### Test recipient opens while everything is local
+For a production extension build, stop `dev:tracking` and run `npm run build -w @opentrackmail/extension`. Reload the unpacked extension. Production builds use `apps/extension/.env.production`; local developer builds use the generated `apps/extension/.env.development.local`, which is removed when the development command stops.
 
-An email recipient cannot load `localhost` from your computer, and HTTPS webmail can block an HTTP image. Keep the application local but give the tracking endpoint a temporary public HTTPS address:
-
-1. Start the dashboard on port 3001.
-2. In another terminal run `cloudflared --config /dev/null tunnel --url http://localhost:3001`. The empty config prevents any existing named-tunnel ingress on the machine from overriding this temporary tunnel.
-3. Copy the generated `https://…trycloudflare.com` URL.
-4. Set `TRACKING_PIXEL_ORIGIN` in `apps/dashboard/.env.local` to that URL and restart the dashboard.
-5. Set `VITE_API_URL` in `apps/extension/.env.local` to the same URL and rebuild the extension.
-6. Reload the unpacked extension at `chrome://extensions` and refresh Gmail.
-7. Confirm `<tunnel-url>/api/health` returns `{ "ok": true }` before sending.
-
-Quick Tunnel URLs change whenever the tunnel restarts, so repeat steps 3–6 after receiving a new URL. The authenticated extension API is also routed through the tunnel; authentication, RLS, and API rate limiting remain active. Do not treat a Quick Tunnel as a production deployment.
+For database development with a fully local Supabase project, use a public HTTPS tunnel to the local dashboard and a custom development extension configuration. The default `dev:tracking` command intentionally requires the deployed and local apps to share a database.
 
 Quality commands:
 
